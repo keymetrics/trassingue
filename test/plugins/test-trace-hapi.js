@@ -13,6 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/**
+ * This file has been modified by Keymetrics
+ */
+
 'use strict';
 
 var common = require('./common.js');
@@ -41,10 +46,7 @@ describe('hapi', function() {
   var agent;
 
   before(function() {
-    agent = require('../..').start({
-      ignoreUrls: ['/ignore'],
-      samplingRate: 0
-    });
+    agent = require('../..').start({ samplingRate: 0 });
   });
 
   Object.keys(versions).forEach(function(version) {
@@ -218,6 +220,7 @@ describe('hapi', function() {
             var labels = common.getMatchingSpan(agent, hapiPredicate).labels;
             assert.equal(labels[traceLabels.HTTP_RESPONSE_CODE_LABEL_KEY], '200');
             assert.equal(labels[traceLabels.HTTP_METHOD_LABEL_KEY], 'GET');
+            assert.equal(labels[traceLabels.HTTP_PATH_LABEL_KEY], '/');
             assert.equal(labels[traceLabels.HTTP_URL_LABEL_KEY], 'http://localhost:9042/');
             assert(labels[traceLabels.HTTP_SOURCE_IP]);
             done();
@@ -276,34 +279,9 @@ describe('hapi', function() {
           }
         });
         server.start(function() {
-          var headers = {};
-          headers[constants.TRACE_CONTEXT_HEADER_NAME] = '123456/1;o=1';
           http.get({port: common.serverPort}, function(res) {
-            assert(!res.headers[constants.TRACE_CONTEXT_HEADER_NAME]);
-              http.get({
-                port: common.serverPort,
-                headers: headers
-              }, function(res) {
-                assert(res.headers[constants.TRACE_CONTEXT_HEADER_NAME].indexOf(';o=1') !== -1);
-                done();
-              });
-          });
-        });
-      });
-
-      it('should not trace ignored urls', function(done) {
-        server = new hapi.Server();
-        server.connection({ port: common.serverPort });
-        server.route({
-          method: 'GET',
-          path: '/ignore/me',
-          handler: function (req, reply) {
-            reply(common.serverRes);
-          }
-        });
-        server.start(function() {
-          http.get({port: common.serverPort, path: '/ignore/me'}, function(res) {
-            assert.equal(common.getTraces(agent).length, 0);
+            assert(
+              res.headers[constants.TRACE_CONTEXT_HEADER_NAME].indexOf(';o=1') !== -1);
             done();
           });
         });

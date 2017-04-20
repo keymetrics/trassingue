@@ -15,6 +15,5 @@
  */
 'use strict';
 
-process.env.GCLOUD_TRACE_LOGLEVEL = 4;
 require('glob'); // Load a module before agent
-require('../..').start();
+require('../..').start({ logLevel: 4 });

@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+/**
+ * This file has been modified by Keymetrics
+ */
+
 'use strict';
 
 var shimmer = require('shimmer');
@@ -41,18 +45,13 @@ function patchRestify(restify, api) {
       // as a label later.
       name: req.path(),
       url: req.url,
+      ip: req.connection.remoteAddress,
+      method: req.method,
       traceContext: req.header(api.constants.TRACE_CONTEXT_HEADER_NAME, null),
       skipFrames: 3
     };
 
     api.runInRootSpan(options, function(rootSpan) {
-      // Set response trace context.
-      var responseTraceContext =
-        api.getResponseTraceContext(options.traceContext, !!rootSpan);
-      if (responseTraceContext) {
-        res.header(api.constants.TRACE_CONTEXT_HEADER_NAME, responseTraceContext);
-      }
-
       if (!rootSpan) {
         return next();
       }
@@ -60,10 +59,15 @@ function patchRestify(restify, api) {
       api.wrapEmitter(req);
       api.wrapEmitter(res);
 
+      // Propagate the trace context to the response.
+      res.header(api.constants.TRACE_CONTEXT_HEADER_NAME,
+                 rootSpan.getTraceContext());
+
       var fullUrl = req.header('X-Forwarded-Proto', 'http') + '://' +
                     req.header('host') + req.url;
       rootSpan.addLabel(api.labels.HTTP_METHOD_LABEL_KEY, req.method);
       rootSpan.addLabel(api.labels.HTTP_URL_LABEL_KEY, fullUrl);
+      rootSpan.addLabel(api.labels.HTTP_PATH_LABEL_KEY, options.name);
       rootSpan.addLabel(api.labels.HTTP_SOURCE_IP,
                         req.connection.remoteAddress);
 

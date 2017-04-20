@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+/**
+ * This file has been modified by Keymetrics
+ */
+
 'use strict';
 
 function RateLimiterPolicy(samplesPerSecond) {
@@ -32,20 +36,27 @@ RateLimiterPolicy.prototype.shouldTrace = function(dateMillis) {
   return true;
 };
 
-function FilterPolicy(basePolicy, filterUrls) {
+function FilterPolicy (basePolicy, filters) {
   this.basePolicy = basePolicy;
-  this.filterUrls = filterUrls;
+  this.filters = filters;
+  this.filters['name'] = this.filters['path'];
 }
 
-FilterPolicy.prototype.matches = function(url) {
-  return this.filterUrls.some(function(candidate) {
-    return (typeof candidate === 'string' && candidate === url) ||
-      url.match(candidate);
+FilterPolicy.prototype.matches = function (request) {
+  var self = this, match = false;
+  Object.keys(request).forEach(function (key) {
+    if (!(self.filters[key] instanceof Array)) return;
+
+    return self.filters[key].some(function (candidate) {
+      match = match ? true : ((typeof candidate === 'string' && request[key] === candidate) ||
+       (candidate instanceof RegExp && request[key].match(candidate)));
+    });
   });
+  return match;
 };
 
-FilterPolicy.prototype.shouldTrace = function(dataMillis, url) {
-  return !this.matches(url) && this.basePolicy.shouldTrace(dataMillis, url);
+FilterPolicy.prototype.shouldTrace = function (dataMillis, request) {
+  return !this.matches(request) && this.basePolicy.shouldTrace(dataMillis, request);
 };
 
 function TraceAllPolicy() {}
@@ -60,17 +71,14 @@ module.exports = {
   TraceAllPolicy: TraceAllPolicy,
   TraceNonePolicy: TraceNonePolicy,
   FilterPolicy: FilterPolicy,
-  createTracePolicy: function(config) {
-    var basePolicy;
-    if (config.samplingRate < 1) {
-      basePolicy = new TraceAllPolicy();
-    } else {
-      basePolicy = new RateLimiterPolicy(config.samplingRate);
-    }
-    if (config.ignoreUrls && config.ignoreUrls.length > 0) {
-      return new FilterPolicy(basePolicy, config.ignoreUrls);
-    } else {
-      return basePolicy;
-    }
+  createTracePolicy: function (config) {
+    var basePolicy = config.samplingRate < 1 ? new TraceAllPolicy() : new RateLimiterPolicy(config.samplingRate);
+
+    // search for a filter to apply
+    var hasFilter = Object.keys(config.ignoreFilter || []).some(function (filter) {
+      return config.ignoreFilter[filter].length > 0;
+    });
+    // if no filter has been set fallback to base policy
+    return hasFilter ? new FilterPolicy(basePolicy, config.ignoreFilter) : basePolicy;
   }
 };

@@ -248,10 +248,6 @@ function clearNamespace(agent) {
   agent.private_().namespace = cls.createNamespace();
 }
 
-function hasContext() {
-  return !!cls.getRootContext();
-}
-
 module.exports = {
   init: init,
   assertSpanDurationCorrect: assertSpanDurationCorrect,
@@ -268,7 +264,6 @@ module.exports = {
   replaceTracingPolicy: replaceTracingPolicy,
   createRootSpanData: createRootSpanData,
   clearNamespace: clearNamespace,
-  hasContext: hasContext,
   getConfig: getConfig,
   installNoopTraceWriter: installNoopTraceWriter,
   avoidTraceWriterAuth: avoidTraceWriterAuth,

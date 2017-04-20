@@ -13,6 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/**
+ * This file has been modified by Keymetrics
+ */
+
 'use strict';
 
 var traceLabels = require('../../src/trace-labels.js');
@@ -28,10 +33,7 @@ describe('test-trace-express', function() {
   var agent;
   var express;
   before(function() {
-    agent = require('../..').start({
-      ignoreUrls: ['/ignore'],
-      samplingRate: 0
-    });
+    agent = require('../..').start({ samplingRate: 0 });
     express = require('./fixtures/express4');
 
     // Mute stderr to satiate appveyor
@@ -159,6 +161,7 @@ describe('test-trace-express', function() {
         var labels = common.getMatchingSpan(agent, expressPredicate).labels;
         assert.equal(labels[traceLabels.HTTP_RESPONSE_CODE_LABEL_KEY], '200');
         assert.equal(labels[traceLabels.HTTP_METHOD_LABEL_KEY], 'GET');
+        assert.equal(labels[traceLabels.HTTP_PATH_LABEL_KEY], '/');
         assert.equal(labels[traceLabels.HTTP_URL_LABEL_KEY], 'http://localhost/');
         assert(labels[traceLabels.HTTP_SOURCE_IP]);
         done();
@@ -230,29 +233,9 @@ describe('test-trace-express', function() {
       res.send(common.serverRes);
     });
     server = app.listen(common.serverPort, function() {
-      var headers = {};
-      headers[constants.TRACE_CONTEXT_HEADER_NAME] = '123456/1;o=1';
       http.get({port: common.serverPort}, function(res) {
-        assert(!res.headers[constants.TRACE_CONTEXT_HEADER_NAME]);
-        http.get({
-          port: common.serverPort,
-          headers: headers
-        }, function(res) {
-          assert(res.headers[constants.TRACE_CONTEXT_HEADER_NAME].indexOf(';o=1') !== -1);
-          done();
-        });
-      });
-    });
-  });
-
-  it('should not trace ignored urls', function(done) {
-    var app = express();
-    app.get('/ignore/me', function (req, res) {
-      res.send(common.serverRes);
-    });
-    server = app.listen(common.serverPort, function() {
-      http.get({port: common.serverPort, path: '/ignore/me'}, function(res) {
-        assert.equal(common.getTraces(agent).length, 0);
+        assert(
+          res.headers[constants.TRACE_CONTEXT_HEADER_NAME].indexOf(';o=1') !== -1);
         done();
       });
     });

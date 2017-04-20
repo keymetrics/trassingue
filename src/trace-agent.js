@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+/**
+ * This file has been modified by Keymetrics
+ */
+
 'use strict';
 
 var cls = require('./cls');
@@ -40,6 +44,10 @@ function TraceAgent(config, logger) {
   this.traceWriter = new TraceWriter(logger, config);
 
   this.policy = tracingPolicy.createTracePolicy(config);
+
+  this.getCls = function() {
+    return cls;
+  };
 
   if (config.onUncaughtException !== 'ignore') {
     this.unhandledException = function() {
@@ -122,15 +130,15 @@ TraceAgent.prototype.endSpan = function(spanData, labels) {
  * Determines whether a trace of the given name should be recorded based
  * on the current tracing policy.
  *
- * @param {string} name the url to trace
- * @param {!number} options the trace header options
+ * @param {string} options the req metadata
+ * @param {!number} headerOptions the trace header options
  */
-TraceAgent.prototype.shouldTrace = function(name, options) {
-  var locallyAllowed = this.policy.shouldTrace(Date.now(), name);
-  // Note: remotelyAllowed is true if no trace options are present.
-  var remotelyAllowed = isNaN(options) ||
-    (options & constants.TRACE_OPTIONS_TRACE_ENABLED);
-  return locallyAllowed && remotelyAllowed;
+TraceAgent.prototype.shouldTrace = function(options, headerOptions) {
+  var locallyAllowed = this.policy.shouldTrace(Date.now(), options);
+  // Note: remotelyDisallowed is false if no trace options are present.
+  var remotelyDisallowed = !(isNaN(headerOptions) ||
+    (headerOptions & constants.TRACE_OPTIONS_TRACE_ENABLED));
+  return locallyAllowed && !remotelyDisallowed;
 };
 
 /**

@@ -13,6 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/**
+ * This file has been modified by Keymetrics
+ */
+
 'use strict';
 
 var Module = require('module');
@@ -42,7 +47,7 @@ function checkLoadedModules() {
   }
   if (process._preload_modules && process._preload_modules.length > 0) {
     var first = process._preload_modules[0];
-    if (first !== '@google-cloud/trace-agent') {
+    if (first !== 'vxx') {
       logger.error('Tracing might not work as ' + first +
             ' was loaded with --require before the trace agent was initialized.');
     }

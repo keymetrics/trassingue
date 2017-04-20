@@ -2,6 +2,8 @@
 
 # Usage: -c to report coverage
 
+export NODE_ENV=test
+
 while true; do
   case $1 in
     -c)
@@ -15,10 +17,14 @@ while true; do
   shift
 done
 
-# Lint
-jshint . || exit 1
-
-./bin/install-test-fixtures.sh
+# Install framework deps
+for dir in test/plugins/fixtures/*/ ;
+do
+  echo -en "travis_fold:start:npm_install_${dir}\\r" | tr / _
+  echo "npm install in ${dir}"
+  (cd "${dir}"; npm install) || exit 1
+  echo -en "travis_fold:end:npm_install_${dir}\\r" | tr / _
+done
 
 # Get test/coverage command
 counter=0
@@ -34,8 +40,7 @@ function run {
 # Run test/coverage
 for test in test/test-*.js test/plugins/*.js ;
 do
-# not v0.12 or not koa = not (v0.12 and koa)
-  if [[ ! $(node --version) =~ v0\.12\..* || ! "${test}" =~ .*trace\-(koa|google\-gax)\.js ]]
+  if [[ ! $(node --version) =~ v0\.12\..* || ! "${test}" =~ .*trace\-koa\.js ]]
   then
     run "${test}"
   fi

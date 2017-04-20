@@ -13,6 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/**
+ * This file has been modified by Keymetrics
+ */
+
 'use strict';
 
 var urlParse = require('url').parse;
@@ -23,18 +28,12 @@ function createMiddleware(api) {
   return function middleware(req, res, next) {
     var options = {
       name: urlParse(req.originalUrl).pathname,
-      url: req.originalUrl,
       traceContext: req.headers[api.constants.TRACE_CONTEXT_HEADER_NAME.toLowerCase()],
+      ip: req.connection.remoteAddress,
+      method: req.method,
       skipFrames: 3
     };
     api.runInRootSpan(options, function(root) {
-      // Set response trace context.
-      var responseTraceContext =
-        api.getResponseTraceContext(options.traceContext, !!root);
-      if (responseTraceContext) {
-        res.setHeader(api.constants.TRACE_CONTEXT_HEADER_NAME, responseTraceContext);
-      }
-
       if (!root) {
         return next();
       }
@@ -48,8 +47,14 @@ function createMiddleware(api) {
       // we use the path part of the url as the span name and add the full
       // url as a label
       root.addLabel(api.labels.HTTP_METHOD_LABEL_KEY, req.method);
+      root.addLabel(api.labels.HTTP_PATH_LABEL_KEY, options.name);
       root.addLabel(api.labels.HTTP_URL_LABEL_KEY, url);
       root.addLabel(api.labels.HTTP_SOURCE_IP, req.connection.remoteAddress);
+
+      var context = root.getTraceContext();
+      if (context) {
+        res.setHeader(api.constants.TRACE_CONTEXT_HEADER_NAME, context);
+      }
 
       // wrap end
       var originalEnd = res.end;
