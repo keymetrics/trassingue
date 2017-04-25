@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+/**
+ * This file has been modified by Keymetrics
+ */
+
 'use strict';
 
 var filesLoadedBeforeTrace = Object.keys(require.cache);
@@ -22,10 +26,9 @@ var filesLoadedBeforeTrace = Object.keys(require.cache);
 // patched before any user-land modules get loaded.
 require('continuation-local-storage');
 
-var common = require('@google-cloud/common');
+var Logger = require('./src/logger.js');
 var extend = require('extend');
 var constants = require('./src/constants.js');
-var gcpMetadata = require('gcp-metadata');
 var traceUtil = require('./src/util.js');
 var TraceApi = require('./src/trace-api.js');
 var pluginLoader = require('./src/trace-plugin-loader.js');
@@ -34,7 +37,7 @@ var modulesLoadedBeforeTrace = [];
 
 for (var i = 0; i < filesLoadedBeforeTrace.length; i++) {
   var moduleName = traceUtil.packageNameFromPath(filesLoadedBeforeTrace[i]);
-  if (moduleName && moduleName !== '@google-cloud/trace-agent' &&
+  if (moduleName && moduleName !== 'vxx' &&
       modulesLoadedBeforeTrace.indexOf(moduleName) === -1) {
     modulesLoadedBeforeTrace.push(moduleName);
   }
@@ -43,16 +46,7 @@ for (var i = 0; i < filesLoadedBeforeTrace.length; i++) {
 var onUncaughtExceptionValues = ['ignore', 'flush', 'flushAndExit'];
 
 var initConfig = function(projectConfig) {
-  var envConfig = {
-    logLevel: process.env.GCLOUD_TRACE_LOGLEVEL,
-    projectId: process.env.GCLOUD_PROJECT,
-    serviceContext: {
-      service: process.env.GAE_SERVICE || process.env.GAE_MODULE_NAME,
-      version: process.env.GAE_VERSION || process.env.GAE_MODULE_VERSION,
-      minorVersion: process.env.GAE_MINOR_VERSION
-    }
-  };
-  var config = extend(true, {}, require('./config.js'), projectConfig, envConfig);
+  var config = extend(true, {}, require('./config.js'), projectConfig);
   if (config.maximumLabelValueSize > constants.TRACE_SERVICE_LABEL_VALUE_LIMIT) {
     config.maximumLabelValueSize = constants.TRACE_SERVICE_LABEL_VALUE_LIMIT;
   }
@@ -87,17 +81,10 @@ function start(projectConfig) {
 
   if (config.logLevel < 0) {
     config.logLevel = 0;
-  } else if (config.logLevel >= common.logger.LEVELS.length) {
-    config.logLevel = common.logger.LEVELS.length - 1;
+  } else if (config.logLevel >= Logger.LEVELS.length) {
+    config.logLevel = Logger.LEVELS.length - 1;
   }
-  var logger = common.logger({
-    level: common.logger.LEVELS[config.logLevel],
-    tag: '@google-cloud/trace-agent'
-  });
-
-  if (config.projectId) {
-    logger.info('Locally provided ProjectId: ' + config.projectId);
-  }
+  var logger = new Logger(config.logLevel, config.logger === 'debug' ? 'vxx' : undefined);
 
   if (onUncaughtExceptionValues.indexOf(config.onUncaughtException) === -1) {
     logger.error('The value of onUncaughtException should be one of ',
@@ -114,45 +101,17 @@ function start(projectConfig) {
       JSON.stringify(modulesLoadedBeforeTrace));
   }
 
-  if (typeof config.projectId === 'undefined') {
-    // Queue the work to acquire the projectId (potentially from the
-    // network.)
-    gcpMetadata.project({
-      property: 'project-id',
-      headers: headers
-    }, function(err, response, projectId) {
-      if (response && response.statusCode !== 200) {
-        if (response.statusCode === 503) {
-          err = new Error('Metadata service responded with a 503 status ' +
-            'code. This may be due to a temporary server error; please try ' +
-            'again later.');
-        } else {
-          err = new Error('Metadata service responded with the following ' +
-            'status code: ' + response.statusCode);
-        }
-      }
-      if (err) {
-        logger.error('Unable to acquire the project number from metadata ' +
-          'service. Please provide a valid project number as an env. ' +
-          'variable, or through config.projectId passed to start(). ' + err);
-        if (traceApi.isActive()) {
-          agent.stop();
-          traceApi.disable_();
-          pluginLoader.deactivate();
-        }
-        return;
-      }
-      config.projectId = projectId;
-    });
-  } else if (typeof config.projectId !== 'string') {
-    logger.error('config.projectId, if provided, must be a string. ' +
-      'Disabling trace agent.');
-    return traceApi;
-  }
-
   agent = require('./src/trace-agent.js').get(config, logger);
   traceApi.enable_(agent);
   pluginLoader.activate(agent);
+
+  traceApi.getCls = function() {
+    return agent.getCls();
+  };
+
+  traceApi.getBus = function() {
+    return agent.traceWriter;
+  };
 
   return traceApi;
 }

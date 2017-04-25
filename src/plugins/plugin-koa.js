@@ -24,6 +24,8 @@ function startSpanForRequest(api, req, res, next) {
     name: urlParse(req.url).pathname,
     url: req.url,
     traceContext: req.headers[api.constants.TRACE_CONTEXT_HEADER_NAME],
+    ip: req.connection.remoteAddress,
+    method: req.method,
     skipFrames: 4
   };
   api.runInRootSpan(options, function(root) {

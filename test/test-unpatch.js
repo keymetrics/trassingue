@@ -72,7 +72,8 @@ describe('index.js', function() {
     wrapTest(mongo.Server.prototype, 'insert');
     wrapTest(mongo.Server.prototype, 'update');
     wrapTest(mongo.Server.prototype, 'remove');
-    wrapTest(mongo.Cursor.prototype, 'next');
+    wrapTest(mongo.Cursor.prototype, '_find');
+    wrapTest(mongo.Cursor.prototype, '_getmore');
   });
 
   it('should wrap/unwrap redis0.12 on start/stop', function() {

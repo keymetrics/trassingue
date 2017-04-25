@@ -29,7 +29,9 @@ describe('test-trace-express', function() {
   var express;
   before(function() {
     agent = require('../..').start({
-      ignoreUrls: ['/ignore'],
+      ignoreFilter: {
+        url: [ /\/ignore/ ]
+      },
       samplingRate: 0
     });
     express = require('./fixtures/express4');

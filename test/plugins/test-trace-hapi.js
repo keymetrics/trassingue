@@ -42,7 +42,9 @@ describe('hapi', function() {
 
   before(function() {
     agent = require('../..').start({
-      ignoreUrls: ['/ignore'],
+      ignoreFilter: {
+        url: [ /\ignore/ ]
+      },
       samplingRate: 0
     });
   });

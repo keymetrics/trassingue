@@ -14,13 +14,17 @@
  * limitations under the License.
  */
 
+/**
+ * This file has been modified by Keymetrics
+ */
+
 'use strict';
 
 
 var cls = require('continuation-local-storage');
 
 /** @const {string} */
-var TRACE_NAMESPACE = 'com.google.cloud.trace';
+var TRACE_NAMESPACE = 'com.km.tracing';
 
 function createNamespace() {
   return cls.createNamespace(TRACE_NAMESPACE);

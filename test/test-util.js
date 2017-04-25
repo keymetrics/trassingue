@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+/**
+ * This file has been modified by Keymetrics
+ */
+
 'use strict';
 
 var assert = require('assert');
@@ -73,12 +77,5 @@ describe('util.findModuleVersion', function() {
   it('should not break for core packages', function() {
     var modulePath = util.findModulePath('http', module);
     assert.equal(util.findModuleVersion(modulePath, Module._load), process.version);
-  });
-
-  it('should work with namespaces', function() {
-    var modulePath = util.findModulePath('@google-cloud/common', module);
-    var truePackage =
-      require('../node_modules/@google-cloud/common/package.json');
-    assert.equal(util.findModuleVersion(modulePath, Module._load), truePackage.version);
   });
 });

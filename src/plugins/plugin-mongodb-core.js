@@ -112,14 +112,16 @@ module.exports = [
       shimmer.wrap(mongo.Server.prototype, 'insert', wrapWithLabel(api, 'mongo-insert'));
       shimmer.wrap(mongo.Server.prototype, 'update', wrapWithLabel(api, 'mongo-update'));
       shimmer.wrap(mongo.Server.prototype, 'remove', wrapWithLabel(api, 'mongo-remove'));
-      shimmer.wrap(mongo.Cursor.prototype, 'next', createNextWrap(api));
+      shimmer.wrap(mongo.Cursor.prototype, '_find', createNextWrap(api));
+      shimmer.wrap(mongo.Cursor.prototype, '_getmore', createNextWrap(api));
     },
     unpatch: function(mongo) {
       shimmer.unwrap(mongo.Server.prototype, 'command');
       shimmer.unwrap(mongo.Server.prototype, 'insert');
       shimmer.unwrap(mongo.Server.prototype, 'update');
       shimmer.unwrap(mongo.Server.prototype, 'remove');
-      shimmer.unwrap(mongo.Cursor.prototype, 'next');
+      shimmer.unwrap(mongo.Cursor.prototype, '_find');
+      shimmer.unwrap(mongo.Cursor.prototype, '_getmore');
     }
   }
 ];
