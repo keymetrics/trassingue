@@ -15,31 +15,25 @@
  */
 'use strict';
 
+var agent = require('..').start({ ignoreFilter: { path: ['/test'] }, samplingRate: 0 });
+
 var assert = require('assert');
 var http = require('http');
+var express = require('./plugins/fixtures/express4');
 
-var common = require('./plugins/common.js');
-
-describe('test-default-ignore-ah-health', function() {
-  var agent;
-  var express;
-  before(function() {
-    agent = require('..').start({samplingRate: 0});
-    express = require('./plugins/fixtures/express4');
-  });
-
-  it('should ignore /_ah/health traces by default', function(done) {
+describe('test-ignore-urls', function() {
+  it('should not trace ignored urls', function(done) {
     var app = express();
-    app.get('/_ah/health', function (req, res) {
-      res.send('🏥');
+    app.get('/test', function (req, res) {
+      res.send('hi');
     });
     var server = app.listen(9042, function() {
-      http.get({port: 9042, path: '/_ah/health'}, function(res) {
+      http.get({port: 9042, path: '/test'}, function(res) {
         var result = '';
         res.on('data', function(data) { result += data; });
         res.on('end', function() {
-          assert.equal(result, '🏥');
-          assert.equal(common.getTraces(agent).length, 0);
+          assert.equal(result, 'hi');
+          assert.equal(agent.private_().traceWriter.buffer_.length, 0);
           server.close();
           done();
         });

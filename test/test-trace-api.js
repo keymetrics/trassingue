@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+/**
+ * This file has been modified by Keymetrics
+ */
+
 'use strict';
 
 var assert = require('assert');
@@ -22,10 +26,11 @@ var EventEmitter = require('events');
 var extend = require('extend');
 var TraceAPI = require('../src/trace-api.js');
 var TracingPolicy = require('../src/tracing-policy.js');
+var Logger = require('../src/logger.js');
 
 var config = extend({}, require('../config.js'),
   { samplingRate: 0, projectId: '0' });
-var logger = require('@google-cloud/common').logger();
+var logger = new Logger(0);
 var agent = require('../src/trace-agent.js').get(config, logger);
 
 function assertAPISurface(traceAPI) {
@@ -184,7 +189,7 @@ describe('Trace Interface', function() {
 
     it('should respect filter urls', function() {
       var url = 'rootUrl';
-      var filterPolicy = new TracingPolicy.FilterPolicy(new TracingPolicy.TraceAllPolicy(), [url]);
+      var filterPolicy = new TracingPolicy.FilterPolicy(new TracingPolicy.TraceAllPolicy(), { url: [url] });
       var oldPolicy = common.replaceTracingPolicy(traceAPI, filterPolicy);
       traceAPI.runInRootSpan({name: 'root1', url: url}, function(rootSpan) {
         assert.strictEqual(rootSpan, null);

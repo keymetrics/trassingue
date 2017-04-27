@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+/**
+ * This file has been modified by Keymetrics
+ */
+
 'use strict';
 
 var shimmer = require('shimmer');
@@ -41,6 +45,8 @@ function patchRestify(restify, api) {
       // as a label later.
       name: req.path(),
       url: req.url,
+      ip: req.connection.remoteAddress,
+      method: req.method,
       traceContext: req.header(api.constants.TRACE_CONTEXT_HEADER_NAME, null),
       skipFrames: 3
     };
@@ -64,6 +70,7 @@ function patchRestify(restify, api) {
                     req.header('host') + req.url;
       rootSpan.addLabel(api.labels.HTTP_METHOD_LABEL_KEY, req.method);
       rootSpan.addLabel(api.labels.HTTP_URL_LABEL_KEY, fullUrl);
+      rootSpan.addLabel(api.labels.HTTP_PATH_LABEL_KEY, options.name);
       rootSpan.addLabel(api.labels.HTTP_SOURCE_IP,
                         req.connection.remoteAddress);
 

@@ -17,60 +17,13 @@
 'use strict';
 
 var assert = require('assert');
-var nock = require('nock');
 var cls = require('../src/cls.js');
 var common = require('./plugins/common.js');
 var trace = require('..');
 
-nock.disableNetConnect();
-
-var uri = 'https://cloudtrace.googleapis.com';
-var path = '/v1/projects/0/traces';
-
 process.env.GCLOUD_PROJECT = 0;
 
-var queueSpans = function(n, agent) {
-  for (var i = 0; i < n; i++) {
-    common.runInTransaction(agent, function(end) {
-      end();
-    });
-  }
-};
-
 describe('tracewriter publishing', function() {
-
-  it('should publish on unhandled exception', function(done) {
-    var agent;
-    process.removeAllListeners('uncaughtException'); // Remove mocha handler
-    var buf;
-    var scope = nock(uri)
-        .intercept(path, 'PATCH', function(body) {
-          assert.equal(JSON.stringify(body.traces), JSON.stringify(buf));
-          return true;
-        }).reply(200);
-    process.on('uncaughtException', function() {
-      setTimeout(function() {
-        var numListeners = process.listeners('uncaughtException').length;
-        process.removeAllListeners('uncaughtException');
-        assert.equal(numListeners, 2);
-        scope.done();
-        done();
-      }, 20);
-    });
-    process.nextTick(function() {
-      agent = trace.start({
-        bufferSize: 1000,
-        samplingRate: 0,
-        onUncaughtException: 'flush'
-      });
-      common.avoidTraceWriterAuth(agent);
-      cls.getNamespace().run(function() {
-        queueSpans(2, agent);
-        buf = common.getTraces(agent);
-        throw new Error(':(');
-      });
-    });
-  });
 
   it('should error on invalid config values', function() {
     assert.throws(function() {

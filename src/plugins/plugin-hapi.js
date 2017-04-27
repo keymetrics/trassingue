@@ -13,6 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/**
+ * This file has been modified by Keymetrics
+ */
+
 'use strict';
 
 var shimmer = require('shimmer');
@@ -37,8 +42,10 @@ function createMiddleware(api) {
     var originalEnd = res.end;
     var options = {
       name: urlParse(req.url).pathname,
-      url: req.url,
       traceContext: req.headers[api.constants.TRACE_CONTEXT_HEADER_NAME],
+      ip: req.connection.remoteAddress,
+      method: req.method,
+      url: req.url,
       skipFrames: 3
     };
     api.runInRootSpan(options, function(root) {
@@ -63,6 +70,7 @@ function createMiddleware(api) {
       // url as a label
       // req.path would be more desirable but is not set at the time our middleware runs.
       root.addLabel(api.labels.HTTP_METHOD_LABEL_KEY, req.method);
+      root.addLabel(api.labels.HTTP_PATH_LABEL_KEY, options.name);
       root.addLabel(api.labels.HTTP_URL_LABEL_KEY, url);
       root.addLabel(api.labels.HTTP_SOURCE_IP, req.connection.remoteAddress);
 

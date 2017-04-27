@@ -15,9 +15,7 @@ while true; do
   shift
 done
 
-# Lint
-jshint . || exit 1
-
+export NODE_ENV=test
 ./bin/install-test-fixtures.sh
 
 # Get test/coverage command
@@ -51,4 +49,3 @@ fi
 # Run non-interference tests
 node test/non-interference/http-e2e.js || exit 1
 node test/non-interference/express-e2e.js || exit 1
-node test/non-interference/restify-e2e.js || exit 1

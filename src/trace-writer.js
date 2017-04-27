@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
+/**
+ * This file has been modified by Keymetrics
+ */
+
 'use strict';
 
-var gcpMetadata = require('gcp-metadata');
-var common = require('@google-cloud/common');
 var util = require('util');
 var traceLabels = require('./trace-labels.js');
-var pjson = require('../package.json');
 var constants = require('./constants.js');
-
-/* @const {Array<string>} list of scopes needed to operate with the trace API */
-var SCOPES = ['https://www.googleapis.com/auth/trace.append'];
+var EventEmitter = require('events').EventEmitter;
 
 var headers = {};
 headers[constants.TRACE_AGENT_REQUEST_HEADER] = 1;
@@ -39,13 +38,7 @@ headers[constants.TRACE_AGENT_REQUEST_HEADER] = 1;
 function TraceWriter(logger, options) {
   options = options || {};
 
-  var serviceOptions = {
-    packageJson: pjson,
-    projectIdRequired: false,
-    baseUrl: 'https://cloudtrace.googleapis.com/v1',
-    scopes: SCOPES
-  };
-  common.Service.call(this, serviceOptions, options);
+  EventEmitter.call(this);
 
   /** @private */
   this.logger_ = logger;
@@ -61,103 +54,12 @@ function TraceWriter(logger, options) {
 
   /** @private {Boolean} whether the trace writer is active */
   this.isActive = true;
-
-  // Schedule periodic flushing of the buffer, but only if we are able to get
-  // the project number (potentially from the network.)
-  var that = this;
-  that.getProjectId(function(err, project) {
-    if (err) { return; } // ignore as index.js takes care of this.
-    that.scheduleFlush_(project);
-  });
-
-  that.getHostname(function(hostname) {
-    that.getInstanceId(function(instanceId) {
-      var labels = {};
-      labels[traceLabels.AGENT_DATA] = 'node ' + pjson.name + ' v' + pjson.version;
-      labels[traceLabels.GCE_HOSTNAME] = hostname;
-      if (instanceId) {
-        labels[traceLabels.GCE_INSTANCE_ID] = instanceId;
-      }
-      var moduleName = that.config_.serviceContext.service || hostname;
-      labels[traceLabels.GAE_MODULE_NAME] = moduleName;
-
-      var moduleVersion = that.config_.serviceContext.version;
-      if (moduleVersion) {
-        labels[traceLabels.GAE_MODULE_VERSION] = moduleVersion;
-        var minorVersion = that.config_.serviceContext.minorVersion;
-        if (minorVersion) {
-          var versionLabel = '';
-          if (moduleName !== 'default') {
-            versionLabel = moduleName + ':';
-          }
-          versionLabel += moduleVersion + '.' + minorVersion;
-          labels[traceLabels.GAE_VERSION] = versionLabel;
-        }
-      }
-      Object.freeze(labels);
-      that.defaultLabels_ = labels;
-    });
-  });
 }
-util.inherits(TraceWriter, common.Service);
+
+util.inherits(TraceWriter, EventEmitter);
 
 TraceWriter.prototype.stop = function() {
   this.isActive = false;
-};
-
-TraceWriter.prototype.getHostname = function(cb) {
-  var that = this;
-  gcpMetadata.instance({
-    property: 'hostname',
-    headers: headers
-  }, function(err, response, hostname) {
-    if (err && err.code !== 'ENOTFOUND') {
-      // We are running on GCP.
-      that.logger_.warn('Unable to retrieve GCE hostname.', err);
-    }
-    cb(hostname || require('os').hostname());
-  });
-};
-
-TraceWriter.prototype.getInstanceId = function(cb) {
-  var that = this;
-  gcpMetadata.instance({
-    property: 'id',
-    headers: headers
-  }, function(err, response, instanceId) {
-    if (err && err.code !== 'ENOTFOUND') {
-      // We are running on GCP.
-      that.logger_.warn('Unable to retrieve GCE instance id.', err);
-    }
-    cb(instanceId);
-  });
-};
-
-/**
- * Returns the project ID if it has been cached and attempts to load
- * it from the enviroment or network otherwise.
- *
- * @param {function(?, number):?} callback an (err, result) style callback
- */
-TraceWriter.prototype.getProjectId = function(callback) {
-  var that = this;
-  if (that.config_.projectId) {
-    callback(null, that.config_.projectId);
-    return;
-  }
-
-  gcpMetadata.project({
-    property: 'project-id',
-    headers: headers
-  }, function(err, response, projectId) {
-    if (err) {
-      callback(err);
-      return;
-    }
-    that.logger_.info('Acquired ProjectId from metadata: ' + projectId);
-    that.config_.projectId = projectId;
-    callback(null, projectId);
-  });
 };
 
 /**
@@ -179,7 +81,11 @@ TraceWriter.prototype.writeSpan = function(spanData) {
       spanData.addLabel(k, this.defaultLabels_[k]);
     }
   }
-  this.queueTrace_(spanData.trace);
+  if (process.env.NODE_ENV === 'test') {
+    this.queueTrace_(spanData.trace);
+  }
+
+  this.emit('transaction', spanData.trace);
 };
 
 /**
@@ -191,22 +97,14 @@ TraceWriter.prototype.writeSpan = function(spanData) {
 TraceWriter.prototype.queueTrace_ = function(trace) {
   var that = this;
 
-  that.getProjectId(function(err, project) {
-    if (err) {
-      that.logger_.info('No project number, dropping trace.');
-      return; // ignore as index.js takes care of this.
-    }
+  that.buffer_.push(JSON.stringify(trace));
+  that.logger_.debug('queued trace. new size:', that.buffer_.length);
 
-    trace.projectId = project;
-    that.buffer_.push(JSON.stringify(trace));
-    that.logger_.debug('queued trace. new size:', that.buffer_.length);
-
-    // Publish soon if the buffer is getting big
-    if (that.buffer_.length >= that.config_.bufferSize) {
-      that.logger_.info('Flushing: trace buffer full');
-      setImmediate(function() { that.flushBuffer_(project); });
-    }
-  });
+  // Publish soon if the buffer is getting big
+  if (that.buffer_.length >= that.config_.bufferSize) {
+    that.logger_.info('Flushing: trace buffer full');
+    setImmediate(function() { that.flushBuffer_(); });
+  }
 };
 
 /**
@@ -214,13 +112,13 @@ TraceWriter.prototype.queueTrace_ = function(trace) {
  * controlled by the flushDelay property of this
  * TraceWriter's config.
  */
-TraceWriter.prototype.scheduleFlush_ = function(project) {
+TraceWriter.prototype.scheduleFlush_ = function() {
   this.logger_.info('Flushing: performing periodic flush');
-  this.flushBuffer_(project);
+  this.flushBuffer_();
 
   // Do it again after delay
   if (this.isActive) {
-    setTimeout(this.scheduleFlush_.bind(this, project),
+    setTimeout(this.scheduleFlush_.bind(this),
       this.config_.flushDelaySeconds * 1000).unref();
   }
 };
@@ -230,7 +128,7 @@ TraceWriter.prototype.scheduleFlush_ = function(project) {
  *
  * @param {number} projectId The id of the project that traces should publish on.
  */
-TraceWriter.prototype.flushBuffer_ = function(projectId) {
+TraceWriter.prototype.flushBuffer_ = function() {
   if (this.buffer_.length === 0) {
     return;
   }
@@ -239,7 +137,6 @@ TraceWriter.prototype.flushBuffer_ = function(projectId) {
   var buffer = this.buffer_;
   this.buffer_ = [];
   this.logger_.debug('Flushing traces', buffer);
-  this.publish_(projectId, '{"traces":[' + buffer.join() + ']}');
 };
 
 /**
@@ -249,26 +146,12 @@ TraceWriter.prototype.flushBuffer_ = function(projectId) {
  * @param {string} json The stringified json representation of the queued traces.
  */
 TraceWriter.prototype.publish_ = function(projectId, json) {
-  // TODO(ofrobots): assert.ok(this.config_.project), and stop accepting
-  // projectId as an argument.
-  var that = this;
-  var uri = 'https://cloudtrace.googleapis.com/v1/projects/' +
-    projectId + '/traces';
-
-  var options = {
-    method: 'PATCH',
-    uri: uri,
-    body: json,
-    headers: headers
-  };
-  that.request(options, function(err, body, response) {
-    if (err) {
-      that.logger_.error('TraceWriter: error: ',
-        ((response && response.statusCode) || '') + '\n' + err.stack);
-    } else {
-      that.logger_.info('TraceWriter: published. statusCode: ' + response.statusCode);
-    }
-  });
+  if (process.send) {
+    process.send({
+      type: 'axm:trace',
+      data: json
+    });
+  }
 };
 
 /**

@@ -29,7 +29,9 @@ describe('test-trace-connect', function() {
   var connect;
   before(function() {
     agent = require('../..').start({
-      ignoreUrls: ['/ignore'],
+      ignoreFilter: {
+        url: [ /\/ignore/ ]
+      },
       samplingRate: 0
     });
     connect = require('./fixtures/connect3');
