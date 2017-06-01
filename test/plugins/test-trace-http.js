@@ -17,10 +17,14 @@
 
 var common = require('./common.js');
 var constants = require('../../src/constants.js');
+var semver = require('semver');
 var stream = require('stream');
 var TraceLabels = require('../../src/trace-labels.js');
 
-var agent = require('../..').start({ samplingRate: 0 });
+var agent = require('../..').start({ 
+  projectId: '0',
+  samplingRate: 0
+});
 
 var assert = require('assert');
 
@@ -41,6 +45,15 @@ describe('test-trace-http', function() {
   afterEach(function() {
     common.cleanTraces(agent);
     server.close();
+  });
+
+  it('should patch the necessary functions', function() {
+    assert.strictEqual(http.request.__wrapped, true);
+    if (semver.satisfies(process.version, '>=8.0.0')) {
+      assert.strictEqual(http.get.__wrapped, true, 'should patch get');
+    } else {
+      assert.strictEqual(http.get.__wrapped, undefined, 'should not patch get');
+    }
   });
 
   it('should accurately measure get time with callback', function(done) {
@@ -274,6 +287,22 @@ describe('test-trace-http', function() {
         for (var i = 0; i < 5; i++) {
           http.get({port: common.serverPort}, handleResponse);
         }
+      })
+    );
+  });
+
+  it('should not interfere with response event emitter api', function(done) {
+    server.listen(common.serverPort, common.runInTransaction.bind(null, agent,
+      function(endTransaction) {
+        http.get({port: common.serverPort}, function(res) {
+          var result = '';
+          res
+          .on('data', function(data) { result += data; })
+          .on('end', function() {
+            endTransaction();
+            done();
+          });
+        });
       })
     );
   });
