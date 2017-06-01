@@ -20,8 +20,9 @@
 
 'use strict';
 
-
-var cls = require('continuation-local-storage');
+var semver = require('semver');
+var cls = require(semver.satisfies(process.verion, '>=8.0.0')
+  ? 'cls-hooked' : 'continuation-local-storage');
 
 /** @const {string} */
 var TRACE_NAMESPACE = 'com.km.tracing';
