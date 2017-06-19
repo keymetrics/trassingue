@@ -5,7 +5,7 @@ language: node_js
 node_js:
   - "4"
   - "6"
-  - "7"
+  - "8"
 
 services:
   - mongodb
@@ -19,7 +19,7 @@ before_install:
   - psql -c "alter user postgres with password 'Password12!';" -U postgres
 
 env:
-  - GCLOUD_PROJECT=0 CXX=g++-4.8
+  - CXX=g++-4.8
 
 script:
   - ./bin/run-test.sh -c
@@ -30,3 +30,7 @@ addons:
     - ubuntu-toolchain-r-test
     packages:
     - g++-4.8
+
+notifications:
+  email:
+    - nodejs-build-notifications+travis@googlegroups.com

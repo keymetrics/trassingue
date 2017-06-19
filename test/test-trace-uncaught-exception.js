@@ -24,6 +24,16 @@ var trace = require('..');
 process.env.GCLOUD_PROJECT = 0;
 
 describe('tracewriter publishing', function() {
+  var savedProject;
+
+  before(function() {
+    savedProject = process.env.GCLOUD_PROJECT;
+    process.env.GCLOUD_PROJECT = '0';
+  });
+
+  after(function() {
+    process.env.GCLOUD_PROJECT = savedProject;
+  });
 
   it('should error on invalid config values', function() {
     assert.throws(function() {

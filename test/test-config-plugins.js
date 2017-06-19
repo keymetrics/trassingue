@@ -22,7 +22,7 @@ var trace = require('..');
 var common = require('./plugins/common.js');
 
 var instrumentedModules = ['connect', 'express', 'generic-pool',
-  'hapi', 'http', 'koa', 'mongodb-core', 'mysql', 'pg', 'redis', 'restify'];
+  'hapi', 'http', 'knex', 'koa', 'mongodb-core', 'mysql', 'pg', 'redis', 'restify'];
 
 describe('plugin configuration', function() {
   it('should have correct defaults', function() {
@@ -46,7 +46,7 @@ describe('plugin configuration', function() {
     }));
   });
 
-  it('should overwrite builtin plugins correctly', function() {
+  it('should overwrite b,uiltin plugins correctly', function() {
     var agent = trace.start({forceNewAgent_: true, plugins: {
       express: 'foo'
     }});

@@ -16,4 +16,7 @@
 'use strict';
 
 require('glob'); // Load a module before agent
-require('../..').start({ logLevel: 4 });
+require('../..').start();
+// Exit explicitly since the process is being held open by retries to the
+// metadata service.
+process.exit(0);

@@ -1,5 +1,107 @@
 # Node.js Agent for Google Cloud Trace ChangeLog
 
+<<<<<<< HEAD
+=======
+## 2017-06-12, Version 2.1.0 (Experimental), @matthewloring
+
+### Notable changes
+
+**bug fixes**
+
+  * [[`a8da1eb821`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/a8da1eb821)] - hapi/koa: End span when request is aborted (#479) (Kelvin Jin) [#479](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/pull/479)
+
+**new plugins**
+
+  * [[`dd7bc9b1ff`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/dd7bc9b1ff)] - Support Knex (#468) (Dominic Kramer) [#468](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/pull/468)
+
+## Commits
+
+* [[`89c1a9769c`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/89c1a9769c)] - Fix trace api docs (#507) (Matthew Loring) [#507](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/pull/507)
+* [[`04e0ed027a`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/04e0ed027a)] - fix patching of res.end (#506) (Ali Ijaz Sheikh) 
+* [[`13b4b9e893`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/13b4b9e893)] - Roll back to old version of got (#504) (Matthew Loring) [#504](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/pull/504)
+* [[`92cab1b888`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/92cab1b888)] - **docs**: Elaborate on GKE Scopes + Syntax Highlighting (#501) (Kelvin Jin) 
+* [[`8eb502b471`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/8eb502b471)] - Node 8 support (#499) (Ali Ijaz Sheikh) 
+* [[`9f83a24182`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/9f83a24182)] - update devDependencies (#500) (Ali Ijaz Sheikh) 
+* [[`0b89d78723`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/0b89d78723)] - fix credentials on system-test (#497) (Ali Ijaz Sheikh) 
+* [[`7c0b35c0f9`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/7c0b35c0f9)] - Update config.js (#496) (Vikram) [#496](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/pull/496)
+* [[`7fafa05cbb`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/7fafa05cbb)] - run system test locally (#490) (Ali Ijaz Sheikh) 
+* [[`5746f63b86`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/5746f63b86)] - system-tests to use custom env. vars. (#494) (Ali Ijaz Sheikh) 
+* [[`98b9ba7187`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/98b9ba7187)] - Unit tests should not depend on the environment (#493) (Ali Ijaz Sheikh) 
+* [[`dd7bc9b1ff`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/dd7bc9b1ff)] - Support Knex (#468) (Dominic Kramer) [#468](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/pull/468)
+* [[`f8b74e6ec0`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/f8b74e6ec0)] - Fix typos in configuration comments (#491) (Oleg Shalygin) [#491](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/pull/491)
+* [[`350efc867d`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/350efc867d)] - Add a system-test (#489) (Ali Ijaz Sheikh) 
+* [[`a8da1eb821`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/a8da1eb821)] - hapi/koa: End span when request is aborted (#479) (Kelvin Jin) [#479](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/pull/479)
+* [[`8b9acd07ce`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/8b9acd07ce)] - Add encrypted service account key for system tests (#488) (Matthew Loring) 
+* [[`c242d8bfbc`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/c242d8bfbc)] - Add test notifications to travis (#485) (Matthew Loring) [#485](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/pull/485)
+
+## 2017-05-15, Version 2.0.0 (Experimental), @matthewloring
+
+### Notable changes
+
+This release drops support for versions of Node.js <4.
+
+**Semver Major**
+
+  * [[`b533f671f0`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/b533f671f0)] - Update deps, drop support for 0.12 (#478) (Matthew Loring) [#478](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/pull/478)
+
+**UI**
+
+  * [[`8812b7a96e`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/8812b7a96e)] - Update trace label names (#467) (Matthew Loring) [#467](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/pull/467)
+
+## Commits
+
+* [[`3a0fb1c133`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/3a0fb1c133)] - Regression test for #481 (#483) (Matthew Loring) [#483](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/pull/483)
+* [[`3f90b20e0d`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/3f90b20e0d)] - **http**: return response object for chaining #481 (#482) (vmarchaud) [#482](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/pull/482)
+* [[`1495eae896`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/1495eae896)] - Fix module-internal requires not being intercepted (#480) (Kelvin Jin) [#480](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/pull/480)
+* [[`b533f671f0`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/b533f671f0)] - Update deps, drop support for 0.12 (#478) (Matthew Loring) [#478](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/pull/478)
+* [[`5080bfc306`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/5080bfc306)] - Add yarn.lock file (#476) (Matthew Loring) [#476](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/pull/476)
+* [[`2500aba504`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/2500aba504)] - pass valid TestRequest message in grpc test (#474) (Ali Ijaz Sheikh) 
+* [[`89d87797ff`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/89d87797ff)] - drop dependency on dummy counter module (#472) (Ali Ijaz Sheikh) 
+* [[`8812b7a96e`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/8812b7a96e)] - Update trace label names (#467) (Matthew Loring) [#467](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/pull/467)
+
+## 2017-04-18, Version 1.1.0 (Experimental), @matthewloring
+
+### Notable changes
+
+**new plugins**
+
+  * [[`9af1726ed1`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/9af1726ed1)] - Support for generic-pool 2 and 3 (#435) (Dominic Kramer) [#435](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/pull/435)
+  * [[`9dfde43b6b`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/9dfde43b6b)] - Koa 2.x support (#464) (Matthew Loring) [#464](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/pull/464)
+
+## Commits
+
+* [[`42de95aaa2`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/42de95aaa2)] - Set response trace context based on that of incoming requests (#463) (Kelvin Jin) [#463](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/pull/463)
+* [[`9af1726ed1`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/9af1726ed1)] - Support for generic-pool 2 and 3 (#435) (Dominic Kramer) [#435](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/pull/435)
+* [[`5c55835eb9`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/5c55835eb9)] - Add tests that context is propagated by child frameworks (#466) (Matthew Loring) [#466](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/pull/466)
+* [[`9dfde43b6b`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/9dfde43b6b)] - Koa 2.x support (#464) (Matthew Loring) [#464](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/pull/464)
+* [[`54e077990d`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/54e077990d)] - Increase timeout to reduce flakiness (#465) (Matthew Loring) [#465](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/pull/465)
+* [[`1d22c9d764`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/1d22c9d764)] - Remove gax patching (#462) (Matthew Loring) [#462](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/pull/462)
+* [[`8cffd41396`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/8cffd41396)] - Now `.DS_Store` files are ignored (#460) (Dominic Kramer) [#460](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/pull/460)
+* [[`b60d142fb9`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/b60d142fb9)] - Clean noisy output of `install-test-fixtures.sh` (#461) (Dominic Kramer) [#461](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/pull/461)
+* [[`1391192472`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/1391192472)] - Allow Manual Test Fixture Management (#459) (Dominic Kramer) [#459](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/pull/459)
+
+## 2017-03-31, Version 1.0.4 (Experimental), @kjin
+
+### Commits
+
+* [[`43ede69323`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/43ede69323)] - Add serviceContext option (#457) (Kelvin Jin) [#457](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/pull/457)
+
+## 2017-03-24, Version 1.0.3 (Experimental), @kjin
+
+### Commits
+
+* [[`0e71269b5b`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/0e71269b5b)] - Include the correct dummy package (#452) (Kelvin Jin) [#452](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/pull/452)
+
+## 2017-03-24, Version 1.0.2 (Experimental), @kjin
+
+### Commits
+
+* [[`39e1c517e4`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/39e1c517e4)] - Track download counts with non-namespaced dependency (#449) (Kelvin Jin) [#449](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/pull/449)
+* [[`c200674954`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/c200674954)] - Stop running google-gax unit test on v0.12 (#450) (Kelvin Jin) [#450](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/pull/450)
+* [[`733f33c3c2`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/733f33c3c2)] - Assign url field in Connect and Koa (#448) (Kelvin Jin) [#448](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/pull/448)
+* [[`c108b35d49`](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/commit/c108b35d49)] - Add url field to hapi middleware options (#447) (Ethan Rubio) [#447](https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/pull/447)
+
+>>>>>>> be0b006b35bd8322f3e6195ffc9ed9fc151839e4
 ## 2017-03-15, Version 1.0.1 (Experimental), @kjin
 
 ### Notable changes

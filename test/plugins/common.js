@@ -15,15 +15,13 @@
  */
 'use strict';
 
-if (!process.env.GCLOUD_PROJECT) {
-  console.log('The GCLOUD_PROJECT environment variable must be set.');
-  process.exit(1);
-}
+var proxyquire  = require('proxyquire');
 
 // We want to disable publishing to avoid conflicts with production.
 require('../../src/trace-writer').publish_ = function() {};
 
 var cls = require('../../src/cls.js');
+var TraceWriter = require('../../src/trace-writer.js');
 var pluginLoader = require('../../src/trace-plugin-loader.js');
 
 var assert = require('assert');
@@ -73,8 +71,10 @@ function cleanTraces(agent) {
   }
 
   var privateAgent = agent.private_();
-  privateAgent.traceWriter.buffer_ = [];
-  privateAgent._shouldTraceArgs = [];
+  if (privateAgent) {
+    privateAgent._shouldTraceArgs = [];
+  }
+  TraceWriter.get().buffer_ = [];
 }
 
 function getTraces(agent) {
@@ -83,7 +83,7 @@ function getTraces(agent) {
       'Received: ' + arguments.length);
   }
 
-  return agent.private_().traceWriter.buffer_.map(JSON.parse);
+  return TraceWriter.get().buffer_.map(JSON.parse);
 }
 
 function getShouldTraceArgs(agent) {
@@ -228,11 +228,11 @@ function getConfig(agent) {
 }
 
 function installNoopTraceWriter(agent) {
-  agent.private_().traceWriter.writeSpan = function() {};
+  TraceWriter.get().writeSpan = function() {};
 }
 
 function avoidTraceWriterAuth(agent) {
-  agent.private_().traceWriter.request = request;
+  TraceWriter.get().request = request;
 }
 
 function stopAgent(agent) {

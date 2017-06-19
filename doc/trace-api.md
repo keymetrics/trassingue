@@ -17,7 +17,7 @@ These functions provide the capability to create trace spans, add labels to them
   * `options`: [`TraceOptions`](#trace-span-options)
   * `fn`: `function(?Span): any`
   * Returns `any` (return value of `fn`)
-  * Attempts to create a root span and runs the given callback, passing it a `Span` object if the root span was successfuly created. Otherwise, the given function is run with `null` as an argument. This may be for one of two reasons:
+  * Attempts to create a root span and runs the given callback, passing it a `Span` object if the root span was successfully created. Otherwise, the given function is run with `null` as an argument. This may be for one of two reasons:
     * The trace policy, as specified by the user-given configuration, disallows a root span from being created under the current circumstances.
     * The trace agent is disabled, either because it wasn't started at all, started in disabled mode, or encountered an initialization error.
   * **Note:** You must call `endSpan` on the span object provided as an argument for the span to be recorded.
@@ -78,9 +78,9 @@ It is highly recommended for plugins to set this header field in responses, _if_
   * `incomingTraceContext`: `string`
   * `isTraced`: `boolean`
   * Returns `string`
-  * Returns a string that should be set in the response headers in a traced request. If incomingTraceContext is falsey (indicating that the incoming request didn't have a trace context), this function returns an empty string.
+  * Returns a string that should be set in the response headers in a traced request. If incomingTraceContext is falsy (indicating that the incoming request didn't have a trace context), this function returns an empty string.
 
-This function is usually called from within the function passed to `runInRootSpan`. See any of the built-in plugins ([express](src/plugins/plugin-express.js#L35)) for an example. Note that the value for `isTraced` is based on the value of the root span - if a root span was created, that means that this request is being traced.
+This function is usually called from within the function passed to `runInRootSpan`. See any of the built-in plugins ([express](../src/plugins/plugin-express.js#L42)) for an example. Note that the value for `isTraced` is based on the value of the root span - if a root span was created, that means that this request is being traced.
 
 ### For Outgoing Requests
 
@@ -94,12 +94,12 @@ Use the following function to obtain the current serialized trace context. The b
 
 These functions help provide context propagation for root spans. Context should be propagated anywhere control is yielded to the user; this is either through a callback or an emitter. This will enable child spans to be associated with the correct root span.
 
-* `api.bind(fn)`
+* `api.wrap(fn)`
   * `fn`: `function`
   * Returns `function` (same signature as `fn`)
   * Binds the given function to the current context.
 
-* `api.bindEmitter(emitter)`
+* `api.wrapEmitter(emitter)`
   * `emitter`: `EventEmitter`
   * Binds any event handlers subsequently attached to the given event emitter to the current context.
 

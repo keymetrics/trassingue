@@ -41,7 +41,7 @@ function TraceAgent(config, logger) {
   this.logger = logger;
 
   this.namespace = cls.createNamespace();
-  this.traceWriter = new TraceWriter(logger, config);
+  this.traceWriter = TraceWriter.create(logger, config);
 
   this.policy = tracingPolicy.createTracePolicy(config);
 

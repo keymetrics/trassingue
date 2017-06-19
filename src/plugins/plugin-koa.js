@@ -54,9 +54,9 @@ function startSpanForRequest(api, req, res, next) {
     root.addLabel(api.labels.HTTP_SOURCE_IP, req.connection.remoteAddress);
 
     // wrap end
-    res.end = function(chunk, encoding) {
+    res.end = function() {
       res.end = originalEnd;
-      const returned = res.end(chunk, encoding);
+      const returned = res.end.apply(this, arguments);
 
       if (req.route && req.route.path) {
         root.addLabel(
@@ -68,6 +68,14 @@ function startSpanForRequest(api, req, res, next) {
 
       return returned;
     };
+
+    // if the event is aborted, end the span (as res.end will not be called)
+    req.once('aborted', function() {
+      root.addLabel(api.labels.ERROR_DETAILS_NAME, 'aborted');
+      root.addLabel(api.labels.ERROR_DETAILS_MESSAGE, 'client aborted the request');
+      root.endSpan();
+    });
+
     api.wrap(next);
   });
 }
