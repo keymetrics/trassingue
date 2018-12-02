@@ -21,12 +21,7 @@ export NODE_ENV=test
 # Get test/coverage command
 counter=0
 function run {
-  C="$(npm bin)/istanbul test"
-  if [ "$cover" ]; then
-    C="$(npm bin)/istanbul cover --dir ./coverage/${counter}"
-    ((counter++))
-  fi
-  ($C "$(npm bin)/_mocha" -- $* --timeout 4000 --R spec) || exit 1
+  ("$(npm bin)/mocha" $* --timeout 4000 --R spec) || exit 1
 }
 
 # Run test/coverage
@@ -38,14 +33,3 @@ do
     run "${test}"
   fi
 done
-
-# Conditionally publish coverage
-if [ "$cover" ]; then
-  istanbul report lcovonly
-  ./node_modules/coveralls/bin/coveralls.js < ./coverage/lcov.info
-  rm -rf ./coverage
-fi
-
-# Run non-interference tests
-node test/non-interference/http-e2e.js || exit 1
-node test/non-interference/express-e2e.js || exit 1

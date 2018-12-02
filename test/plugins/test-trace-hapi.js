@@ -33,8 +33,7 @@ var versions = {
   hapi12: './fixtures/hapi12',
   hapi13: './fixtures/hapi13',
   hapi14: './fixtures/hapi14',
-  hapi15: './fixtures/hapi15',
-  hapi16: './fixtures/hapi16'
+  hapi15: './fixtures/hapi15'
 };
 
 describe('hapi', function() {

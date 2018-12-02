@@ -30,7 +30,7 @@ var fs = require('fs');
 var path = require('path');
 var request = require('request');
 
-var FORGIVENESS = 0.2;
+var FORGIVENESS = 0.5;
 var SERVER_WAIT = 200;
 var SERVER_PORT = 9042;
 var SERVER_RES = '1729';

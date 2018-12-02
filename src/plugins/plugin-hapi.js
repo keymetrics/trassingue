@@ -23,7 +23,7 @@
 var shimmer = require('shimmer');
 var urlParse = require('url').parse;
 
-var SUPPORTED_VERSIONS = '8 - 16';
+var SUPPORTED_VERSIONS = '8 - 15';
 
 function createConnectionWrap(api) {
   return function connectionWrap(connection) {
