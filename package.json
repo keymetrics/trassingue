@@ -1,9 +1,8 @@
 {
-  "name": "vxx",
-  "version": "1.3.0",
+  "name": "@pm2/legacy-tracing",
+  "version": "1.4.0",
   "description": "Node.js Tracing Driver",
   "main": "index.js",
-  "repository": "keymetrics/vxx",
   "scripts": {
     "test": "./bin/run-test.sh",
     "system-test": "mocha --no-timeouts system-test/*.js",
