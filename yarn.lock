@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@pm2/continuation-local-storage@^3.2.2":
-  version "3.2.2"
-  resolved "https://registry.yarnpkg.com/@pm2/continuation-local-storage/-/continuation-local-storage-3.2.2.tgz#0229248ce8c613768a87f16c9a6bc67019d2ec89"
-  integrity sha512-JOY8uI8ipt6+dRdNHwo5yjpuwZVQqCdodxZy0XkeGyNTWVr6OqXGFdt9gch8G/bRt9a86BtD/Og5GhtWIY3qwQ==
+"@pm2/continuation-local-storage@^3.2.3":
+  version "3.2.3"
+  resolved "https://registry.yarnpkg.com/@pm2/continuation-local-storage/-/continuation-local-storage-3.2.3.tgz#76361d70ede761f7b4248d753075e9d32626eb3d"
+  integrity sha512-QrhEM/uaOCHhQc/uynuVV4ZVtLtaXZcvKoQ2SQ41YS2HIKUq+wiijudXBKcHSaJBhHBW5aSOiXw/v7niumxuhw==
   dependencies:
     async-listener "^0.6.10"
     emitter-listener "^1.1.1"
