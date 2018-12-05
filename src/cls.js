@@ -21,7 +21,7 @@
 'use strict';
 
 
-var cls = require('continuation-local-storage');
+var cls = require('@pm2/continuation-local-storage');
 
 /** @const {string} */
 var TRACE_NAMESPACE = 'com.km.tracing';

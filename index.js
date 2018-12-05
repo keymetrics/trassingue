@@ -24,7 +24,7 @@ var filesLoadedBeforeTrace = Object.keys(require.cache);
 
 // Load continuation-local-storage first to ensure the core async APIs get
 // patched before any user-land modules get loaded.
-require('continuation-local-storage');
+require('@pm2/continuation-local-storage');
 
 var Logger = require('./src/logger.js');
 var extend = require('extend');
