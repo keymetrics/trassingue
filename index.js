@@ -37,7 +37,7 @@ var modulesLoadedBeforeTrace = [];
 
 for (var i = 0; i < filesLoadedBeforeTrace.length; i++) {
   var moduleName = traceUtil.packageNameFromPath(filesLoadedBeforeTrace[i]);
-  if (moduleName && moduleName !== 'vxx' &&
+  if (moduleName && moduleName !== '@pm2/legacy-tracing' &&
       modulesLoadedBeforeTrace.indexOf(moduleName) === -1) {
     modulesLoadedBeforeTrace.push(moduleName);
   }

@@ -48,7 +48,7 @@ function checkLoadedModules() {
   }
   if (process._preload_modules && process._preload_modules.length > 0) {
     var first = process._preload_modules[0];
-    if (first !== 'vxx') {
+    if (first !== '@pm2/legacy-tracing') {
       logger.error('Tracing might not work as ' + first +
             ' was loaded with --require before the trace agent was initialized.');
     }
