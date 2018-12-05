@@ -1,6 +1,6 @@
 {
   "name": "@pm2/legacy-tracing",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Node.js Tracing Driver",
   "main": "index.js",
   "scripts": {
