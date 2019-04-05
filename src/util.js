@@ -98,8 +98,12 @@ function packageNameFromPath(path) {
  */
 function findModulePath(request, parent) {
   var mainScriptDir = path.dirname(Module._resolveFilename(request, parent));
-  var resolvedModule = Module._resolveLookupPaths(request, parent);
-  var paths = resolvedModule[1];
+  var resolvedModule = Module._resolveLookupPaths(request, parent, true);
+  if (resolvedModule === null)
+    return null;
+  var paths = (resolvedModule.length !== 2 || typeof resolvedModule[1] !== 'object') ?
+    resolvedModule :
+    resolvedModule[1];
   for (var i = 0, PL = paths.length; i < PL; i++) {
     if (mainScriptDir.indexOf(paths[i]) === 0) {
       return path.join(paths[i], request.replace('/', path.sep));
